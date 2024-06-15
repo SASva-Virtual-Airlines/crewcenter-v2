@@ -58,13 +58,41 @@ class AircraftController extends Controller
             $w['subfleet_id'] = $request->input('subfleet');
         }
 
-        $aircraft = $this->aircraftRepo->with(['subfleet'])->whereOrder($w, 'registration', 'asc');
-        $aircraft = $aircraft->all();
+        $aircraft = $this->aircraftRepo->with(['subfleet'])->where($w)->sortable('registration')->get();
+        $trashed = $this->aircraftRepo->onlyTrashed()->orderBy('deleted_at', 'desc')->get();
 
         return view('admin.aircraft.index', [
             'aircraft'    => $aircraft,
             'subfleet_id' => $request->input('subfleet'),
+            'trashed'     => $trashed,
         ]);
+    }
+
+    /**
+     * Recycle Bin operations, either restore or permanently delete the object
+     */
+    public function trashbin(Request $request)
+    {
+        $object_id = (isset($request->object_id)) ? $request->object_id : null;
+
+        $aircraft = Aircraft::onlyTrashed()->withCount('pireps')->where('id', $object_id)->first();
+
+        if ($object_id && $request->action === 'restore') {
+            $aircraft->restore();
+            Flash::success('Aircraft RESTORED successfully.');
+        } elseif ($object_id && $request->action === 'delete') {
+            // Check if the aircraft is used or not
+            if ($aircraft->pireps_count > 0) {
+                Flash::info('Can not delete aircraft, it is used in pireps');
+            } else {
+                $aircraft->forceDelete();
+                Flash::error('Aircraft DELETED PERMANENTLY.');
+            }
+        } else {
+            Flash::info('Nothing done!');
+        }
+
+        return back();
     }
 
     /**

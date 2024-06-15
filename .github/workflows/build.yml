@@ -12,11 +12,12 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php-versions: ['8.1', '8.2']
+        php-versions: ['8.1', '8.2', '8.3']
     name: PHP ${{ matrix.php-versions }}
     env:
       extensions: intl, pcov, mbstring
       key: cache-v1
+      MYSQL_ROOT_PASSWORD: root
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -60,15 +61,30 @@ jobs:
     - name: Shutdown Ubuntu MySQL
       run: sudo service mysql stop
 
-    - name: Install MariaDB
-      uses: getong/mariadb-action@v1.1
+#    - name: Install MariaDB
+#      uses: getong/mariadb-action@v1.1
+#      with:
+#        character set server: 'utf8'
+#        collation server: 'utf8_general_ci'
+#        mysql database: 'phpvms'
+#        mysql root password: ''
+#        mysql user: ''
+#        mysql password: ''
+
+    - name: Install MySQL
+      uses: mirromutth/mysql-action@v1.1
       with:
-        character set server: 'utf8'
-        collation server: 'utf8_general_ci'
+        mysql version: '8.0'
         mysql database: 'phpvms'
-        mysql root password: ''
+        mysql root password: $MYSQL_ROOT_PASSWORD
         mysql user: ''
         mysql password: ''
+
+    - name: Wait for MySQL
+      run: |
+        while ! mysqladmin ping -h127.0.0.1 --silent; do
+          sleep 1
+        done
 
     - name: Configure Environment
       run: |
@@ -87,7 +103,7 @@ jobs:
       run: |
         export PHP_CS_FIXER_IGNORE_ENV=1
         #vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --diff --using-cache=no
-        vendor/bin/phpunit --debug --verbose
+        vendor/bin/phpunit
 
   # This runs after all of the tests, run have run. Creates a cleaned up version of the
   # distro, and then creates the artifact to push up to S3 or wherever

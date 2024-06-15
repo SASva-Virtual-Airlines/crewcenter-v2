@@ -2,6 +2,7 @@ _ide_helper.php
 .php_cs.cache
 .phpstorm.meta.php
 .phpunit.result.cache
+.phpunit.cache
 /vendor
 node_modules/
 npm-debug.log
@@ -20,6 +21,8 @@ storage/*.key
 storage/settings.json
 storage/*.sqlite
 .env.php
+.env.old
+.envrc
 .env
 .github/scripts/env.test
 .vagrant

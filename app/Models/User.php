@@ -16,6 +16,8 @@ use Illuminate\Notifications\Notifiable;
 use Kyslik\ColumnSortable\Sortable;
 use Laratrust\Contracts\LaratrustUser;
 use Laratrust\Traits\HasRolesAndPermissions;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 /**
@@ -30,11 +32,12 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property string           api_key
  * @property mixed            timezone
  * @property string           ident
+ * @property string           atc
  * @property string           curr_airport_id
  * @property string           home_airport_id
  * @property string           avatar
  * @property Airline          airline
- * @property Flight[]         flights
+ * @property int              flights
  * @property int              flight_time
  * @property int              transfer_time
  * @property string           remember_token
@@ -52,12 +55,14 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property string           last_pirep_id
  * @property Pirep            last_pirep
  * @property UserFieldValue[] fields
+ * @property UserOAuthToken[] oauth_tokens
  * @property Role[]           roles
  * @property Subfleet[]       subfleets
  * @property TypeRating[]     typeratings
  * @property Airport          home_airport
  * @property Airport          current_airport
  * @property Airport          location
+ * @property Bid[]            bids
  *
  * @mixin \Illuminate\Database\Eloquent\Builder
  * @mixin \Illuminate\Notifications\Notifiable
@@ -72,6 +77,7 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
     use Notifiable;
     use SoftDeletes;
     use Sortable;
+    use LogsActivity;
 
     public $table = 'users';
 
@@ -120,7 +126,6 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
         'api_key',
         'email',
         'name',
-        'discord_id',
         'discord_private_channel_id',
         'password',
         'last_ip',
@@ -154,6 +159,7 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
     public $sortable = [
         'id',
         'name',
+        'email',
         'pilot_id',
         'callsign',
         'country',
@@ -165,6 +171,7 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
         'flight_time',
         'transfer_time',
         'created_at',
+        'state',
     ];
 
     /**
@@ -182,6 +189,23 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
                 ) : optional($this->airline)->icao;
 
                 return $ident_code.str_pad($attrs['pilot_id'], $length, '0', STR_PAD_LEFT);
+            }
+        );
+    }
+
+    /**
+     * Format the pilot atc callsign, either return alphanumeric callsign or ident
+     *
+     * @return Attribute
+     */
+    public function atc(): Attribute
+    {
+        return Attribute::make(
+            get: function ($_, $attrs) {
+                $ident_code = filled(setting('pilots.id_code')) ? setting('pilots.id_code') : optional($this->airline)->icao;
+                $atc = filled($attrs['callsign']) ? $ident_code.$attrs['callsign'] : $ident_code.$attrs['pilot_id'];
+
+                return $atc;
             }
         );
     }
@@ -239,7 +263,7 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
     {
         return Attribute::make(
             get: function ($_, $attrs) {
-                if (!$attrs['avatar']) {
+                if (!array_key_exists('avatar', $attrs) || !$attrs['avatar']) {
                     return null;
                 }
 
@@ -279,6 +303,15 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
         return $avatar->url;
     }
 
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly($this->fillable)
+            ->logExcept(array_merge($this->hidden, ['created_at', 'updated_at']))
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
     /**
      * Relationships
      */
@@ -289,7 +322,7 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
 
     public function awards(): BelongsToMany
     {
-        return $this->belongsToMany(Award::class, 'user_awards')->withTrashed();
+        return $this->belongsToMany(Award::class, 'user_awards')->withTimestamps()->withTrashed();
     }
 
     public function bids(): HasMany
@@ -320,6 +353,11 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
     public function fields(): HasMany
     {
         return $this->hasMany(UserFieldValue::class, 'user_id');
+    }
+
+    public function oauth_tokens(): HasMany
+    {
+        return $this->hasMany(UserOAuthToken::class, 'user_id');
     }
 
     public function pireps(): HasMany

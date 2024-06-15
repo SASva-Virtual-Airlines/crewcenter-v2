@@ -72,11 +72,41 @@ class SubfleetController extends Controller
     public function index(Request $request): View
     {
         $this->subfleetRepo->with(['airline'])->pushCriteria(new RequestCriteria($request));
-        $subfleets = $this->subfleetRepo->orderby('name', 'asc')->get();
+        $subfleets = $this->subfleetRepo->sortable('name')->get();
+        $trashed = $this->subfleetRepo->onlyTrashed()->orderBy('deleted_at', 'desc')->get();
 
         return view('admin.subfleets.index', [
             'subfleets' => $subfleets,
+            'trashed'   => $trashed,
         ]);
+    }
+
+    /**
+     * Recycle Bin operations, either restore or permanently delete the object
+     */
+    public function trashbin(Request $request)
+    {
+        $object_id = (isset($request->object_id)) ? $request->object_id : null;
+
+        $subfleet = Subfleet::onlyTrashed()->where('id', $object_id)->first();
+        $duplicate_check = Subfleet::where('type', $subfleet->type)->count();
+
+        if ($object_id && $request->action === 'restore') {
+            // Change the type id if it is used
+            if ($duplicate_check > 0) {
+                $subfleet->type = $subfleet->type.'_RESTORED';
+                $subfleet->save();
+            }
+            $subfleet->restore();
+            Flash::success('Subfleet RESTORED successfully.');
+        } elseif ($object_id && $request->action === 'delete') {
+            $subfleet->forceDelete();
+            Flash::error('Subfleet DELETED PERMANENTLY.');
+        } else {
+            Flash::info('Nothing done!');
+        }
+
+        return back();
     }
 
     /**
