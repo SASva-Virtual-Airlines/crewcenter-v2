@@ -154,12 +154,12 @@ function buildSasvaAssets()
   mix.js("resources/js/sasva/app.js", "public/assets/sasva/js/app.js")
 }
 
-//copyAssets();
-//buildFrontendAssets();
-//buildAdminAssets();
-//buildInstallerAssets();
-//buildGlobalAssets();
-//buildApp();
+copyAssets();
+buildFrontendAssets();
+buildAdminAssets();
+buildInstallerAssets();
+buildGlobalAssets();
+buildApp();
 buildSasvaAssets();
 
 mix.webpackConfig({
