@@ -22,8 +22,13 @@
     <div class="w-full md:w-8/12 flex flex-col self-start">
       <div id="airport__statistics" class="w-full shadow-sm">
         <div class="flex flex-col bg-white rounded-sm">
-          <div id="airportStatsHead" class="flex border-b border-gray-100 p-4">
+          <div id="airportStatsHead" class="flex border-b border-gray-100 p-4 justify-between">
             <h2 class="text-xl font-medium">Pirep Statistics</h2>
+            <ul class="flex">
+              <li class="bg-blue-900 text-white text-xs font-medium px-2 py-1 rounded-sm">
+                Source: {{ PirepSource::label($pirep->source) }}
+              </li>
+            </ul>
           </div>
           <div id="airportStatsBody" class="flex flex-row text-center items-center p-4 divide-x">
             <div class="w-3/12">
