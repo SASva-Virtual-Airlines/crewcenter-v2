@@ -23,7 +23,7 @@
       <div id="airport__statistics" class="w-full shadow-sm">
         <div class="flex flex-col bg-white rounded-sm">
           <div id="airportStatsHead" class="flex border-b border-gray-100 p-4">
-            <h2 class="text-xl font-medium">Airport Statistics</h2>
+            <h2 class="text-xl font-medium">Pirep Statistics</h2>
           </div>
           <div id="airportStatsBody" class="flex flex-row text-center items-center p-4 divide-x">
             <div class="w-3/12">
