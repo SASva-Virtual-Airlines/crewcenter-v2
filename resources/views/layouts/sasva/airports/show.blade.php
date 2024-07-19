@@ -8,7 +8,7 @@
       <div id="airportTitle" class="flex border-b border-gray-100 p-4">
         <h2 class="text-xl font-medium">{{ $airport->full_name }}</h2>
       </div>
-      <div id="airportMap" class="flex flex-col divide-x">
+      <div id="airportMap" class="flex flex-col divide-x z-0">
         {{ Widget::AirspaceMap(['width' => '100%', 'height' => '400px', 'lat' => $airport->lat, 'lon' => $airport->lon]) }}
       </div>
     </div>
