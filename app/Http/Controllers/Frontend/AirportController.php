@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Laracasts\Flash\Flash;
+use Illuminate\Support\Collection;
 
 class AirportController extends Controller
 {
@@ -60,7 +61,7 @@ class AirportController extends Controller
         ->findWhere([
             'arr_airport_id' => $id,
             'active'         => 1,
-        ])->random(10);
+        ])->random(fn (Collection $items) => min(10, count($items)));
 
         $outbound_flights = $this->flightRepo
             ->with($with_flights)
@@ -74,7 +75,7 @@ class AirportController extends Controller
             ->findWhere([
                 'dpt_airport_id' => $id,
                 'active'         => 1,
-            ])->random(10);
+            ])->random(fn (Collection $items) => min(10, count($items)));
 
         return view('airports.show', [
             'airport'          => $airport,
