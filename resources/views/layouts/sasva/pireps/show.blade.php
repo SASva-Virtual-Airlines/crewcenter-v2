@@ -36,7 +36,7 @@
               <h6 class="text-base font-medium">Landing Rate</h6>
             </div>
             <div class="w-3/12">
-              <h2 class="text-2xl">{{ $pirep->score }}</h2>
+              <h2 class="text-2xl">{{ $pirep->score ?? 'N/A' }}</h2>
               <h6 class="text-base font-medium">Score</h6>
             </div>
             <div class="w-3/12">
