@@ -32,12 +32,12 @@
           </div>
           <div id="airportStatsBody" class="flex flex-row text-center items-center p-4 divide-x">
             <div class="w-3/12">
-              <h2 class="text-2xl">{{ $pirep->dpt_airport_id }}</h2>
-              <h6 class="text-base font-medium">Departure Airport</h6>
+              <h2 class="text-2xl">{{ number_format($pirep->landing_rate) }} fpm</h2>
+              <h6 class="text-base font-medium">Landing Rate</h6>
             </div>
             <div class="w-3/12">
-              <h2 class="text-2xl">{{ $pirep->arr_airport_id }}</h2>
-              <h6 class="text-base font-medium">Arrival Airport</h6>
+              <h2 class="text-2xl">{{ $pirep->score }}</h2>
+              <h6 class="text-base font-medium">Score</h6>
             </div>
             <div class="w-3/12">
               <h2 class="text-2xl">{{ $pirep->distance }} NM</h2>
