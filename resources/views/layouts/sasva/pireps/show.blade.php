@@ -58,10 +58,18 @@
     <div class="w-4/12 flex flex-col self-start">
       <div id="airportNotes" class="bg-white shadow-sm">
         <div id="airportNotes_head" class="border-b border-gray-100 p-4">
-          <h2 class="text-xl font-medium">Airport notes</h2>
+          <h2 class="text-xl font-medium">Comments</h2>
         </div>
-        <div id="airportNotes_body" class="p-4">
-          {{ $pirep->comments }}
+        <div id="airportNotes_body" class="p-4 divide-y">
+          @foreach($pirep->comments as $comment)
+              <div>
+                <div class="flex flex-row justify-between">
+                  <h2 class="text-base font-semibold">{{ $comment->user->name }} - SAS{{ $comment->user->pilot_id }}</h2>
+                  <span class="text-base text-gray-500">{{ show_datetime($comment->created_at) }}</span>
+                </div>
+                <p>{{ $comment->comment }}</p>
+              </div>
+          @endforeach
         </div>
       </div>
       
