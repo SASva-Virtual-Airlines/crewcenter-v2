@@ -45,7 +45,7 @@
         <div id="airportInboundFlights" class="w-6/12 bg-white shadow-sm">
           <div id="airportInboundFlights_head" class="p-4 border-b border-gray-100">
             <h2 class="text-xl font-medium">Inbound flights</h2>
-            <h6 class="text-sm text-gray-500">Flights flying into {{ $airport->icao }}</h6>
+            <h6 class="text-sm text-gray-500">10 flights flying into {{ $airport->icao }}</h6>
           </div>
           <div id="airportInboundFlights_body">
             <table class="table-auto w-full">
@@ -54,7 +54,7 @@
                 <th class="text-base text-white font-medium px-2 py-3">Departure Airport</th>
               </thead>
               <tbody class="divide-y divide-gray-100">
-                @foreach($inbound_flights as $flight)
+                @foreach($random_inbound_flights as $flight)
                   <tr>
                     <td class="text-base text-center py-3">
                       <a href="{{ route('frontend.flights.show', [$flight->id]) }}">
@@ -69,7 +69,7 @@
                 @endforeach
               </tbody>
             </table>
-            @if(!$inbound_flights)
+            @if(!$random_inbound_flights)
               <div class="flex justify-center p-4">
                 <span>@lang('flights.none')</span>
               </div>
@@ -80,7 +80,7 @@
         <div id="airportOutboundFlights" class="w-6/12 bg-white shadow-sm">
           <div id="airportOutboundFlights_head" class="p-4 border-b border-gray-100">
             <h2 class="text-xl font-medium">Outbound flights</h2>
-            <h6 class="text-sm text-gray-500">Flights flying from {{ $airport->icao }}</h6>
+            <h6 class="text-sm text-gray-500">10 flights flying from {{ $airport->icao }}</h6>
           </div>
           <div id="airportOutboundFlights_body">
             <table class="table-auto w-full">
@@ -89,7 +89,7 @@
                 <th class="text-base text-white font-medium px-2 py-3">Arrival Airport</th>
               </thead>
               <tbody class="divide-y divide-gray-100">
-                @foreach($outbound_flights as $flight)
+                @foreach($random_outbound_flights as $flight)
                   <tr>
                     <td class="text-base text-center py-3">
                       <a href="{{ route('frontend.flights.show', [$flight->id]) }}">
@@ -104,7 +104,7 @@
                 @endforeach
               </tbody>
             </table>
-            @if(!$outbound_flights)
+            @if(!$random_outbound_flights)
               <div class="flex justify-center p-4">
                 <span>@lang('flights.none')</span>
               </div>

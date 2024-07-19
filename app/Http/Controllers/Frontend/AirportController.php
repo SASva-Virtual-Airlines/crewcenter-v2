@@ -55,6 +55,13 @@ class AirportController extends Controller
                 'active'         => 1,
             ])->all();
 
+        $random_inbound_flights = $this->flightRepo
+        ->with($with_flights)
+        ->findWhere([
+            'arr_airport_id' => $id,
+            'active'         => 1,
+        ])->random(10);
+
         $outbound_flights = $this->flightRepo
             ->with($with_flights)
             ->findWhere([
@@ -62,10 +69,19 @@ class AirportController extends Controller
                 'active'         => 1,
             ])->all();
 
+        $random_outbound_flights = $this->flightRepo
+            ->with($with_flights)
+            ->findWhere([
+                'dpt_airport_id' => $id,
+                'active'         => 1,
+            ])->random(10);
+
         return view('airports.show', [
             'airport'          => $airport,
             'inbound_flights'  => $inbound_flights,
+            'random_inbound_flights'  => $random_inbound_flights,
             'outbound_flights' => $outbound_flights,
+            'random_outbound_flights' => $random_outbound_flights,
         ]);
     }
 }
