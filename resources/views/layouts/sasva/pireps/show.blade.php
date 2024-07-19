@@ -35,12 +35,12 @@
               <h6 class="text-base font-medium">Arrival Airport</h6>
             </div>
             <div class="w-3/12">
-              <h2 class="text-2xl">0 NM</h2>
+              <h2 class="text-2xl">{{ $pirep->distance }} NM</h2>
               <h6 class="text-base font-medium">Distance Travelled</h6>
             </div>
             <div class="w-3/12">
-              <h2 class="text-2xl">00:00</h2>
-              <h6 class="text-base font-medium">Block Time</h6>
+              <h2 class="text-2xl">@minutestotime($pirep->flight_time)</h2>
+              <h6 class="text-base font-medium">Flight Time</h6>
             </div>
           </div>
         </div>
